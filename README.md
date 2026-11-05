@@ -10,14 +10,23 @@
 需要 DSH（DeepSeek Harness）与**本机已登录、可正常调用的 Codex CLI**（`codex` 可执行文件会自动在
 `%LOCALAPPDATA%\OpenAI\Codex\bin\*\codex.exe`、`CODEX_BIN`、PATH 里找）。
 
+### 从 npm（推荐）
+
+```
+dsh-codex-handoff@0.1.1
+```
+
+- 界面：**插件** 页 → 添加 → 输入 `dsh-codex-handoff`
+- 工具：`plugin_manager` → `install_bundle`，`target` 填 `dsh-codex-handoff@0.1.1`
+
+### 从源码
+
 ```powershell
 git clone https://github.com/HATO-24/dsh-codex-handoff.git
 ```
 
-然后在 DSH 里装进当前 profile，两种方式任选：
-
-- 界面：**插件** 页 → 添加 → 指向克隆下来的目录；
-- 工具：`plugin_manager` → `install_bundle`，`target` 填该目录的绝对路径。
+然后在 DSH 里装进当前 profile：界面里 **插件** 页 → 添加 → 指向克隆下来的目录，
+或用 `plugin_manager` → `install_bundle`，`target` 填该目录的绝对路径。
 
 装好后：
 
