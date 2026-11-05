@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="GPT conversation bridge">
+  <rect x="1" y="1" width="30" height="30" rx="7" fill="#1f6feb"/>
+  <path d="M8 9.5A2.5 2.5 0 0 1 10.5 7h6A2.5 2.5 0 0 1 19 9.5v4a2.5 2.5 0 0 1-2.5 2.5H13l-3.4 2.7V16h-1.1A2.5 2.5 0 0 1 8 13.5v-4Z" fill="#fff"/>
+  <path d="M16.5 17.5A2.5 2.5 0 0 1 19 15h3.5A2.5 2.5 0 0 1 25 17.5v3a2.5 2.5 0 0 1-2.5 2.5H22v2.6L19 23h-1.5a2.5 2.5 0 0 1-2.5-2.5v-3Z" fill="#fff" opacity="0.72"/>
+</svg>

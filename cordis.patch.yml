@@ -1,0 +1,5 @@
+# GPT/Codex 对话桥：Host 半边负责调用本机 codex CLI、保存会话、提供 /api/codex-bridge 路由，
+# Client 半边在侧栏注册一个可点开的对话记录面板。
+- insert:
+    - id: codex-bridge
+      name: dsh-codex-bridge

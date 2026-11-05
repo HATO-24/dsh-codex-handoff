@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "GPT 对话桥",
+    "description": "把本机 Codex（GPT）的多轮会话接进 DSH：侧栏查看每一轮往来，会话落进 Codex 会话库，可用 codex_gpt 工具续接协作。"
+  }
+}

@@ -1,0 +1,16 @@
+# 本地桥接数据（会话索引、提问/回复、事件流）不纳入版本库
+.bridge/
+threads.json
+
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+
+# 依赖与构建产物
+node_modules/
+dist/
+
+# 本地实验
+*.tmp

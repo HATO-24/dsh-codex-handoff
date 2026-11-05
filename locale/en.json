@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "GPT conversation bridge",
+    "description": "Bridges multi-turn conversations with the local Codex (GPT) CLI into DSH: review each exchange from the sidebar, keep sessions in the Codex session store, and continue them through the codex_gpt tool."
+  }
+}

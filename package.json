@@ -1,0 +1,50 @@
+{
+  "name": "dsh-codex-bridge",
+  "version": "0.1.0",
+  "description": "GPT/Codex 对话桥：把本机 Codex CLI 的多轮会话接进 DSH，侧栏与右侧抽屉可查看往来，会话落进 Codex 会话库并可 resume 续接；提供 codex_gpt 工具与模型/推理强度切换。",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "README.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true
+    }
+  },
+  "license": "MIT",
+  "author": "HATO-24",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HATO-24/dsh-codex-bridge.git"
+  },
+  "homepage": "https://github.com/HATO-24/dsh-codex-bridge#readme",
+  "bugs": {
+    "url": "https://github.com/HATO-24/dsh-codex-bridge/issues"
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "codex",
+    "gpt",
+    "openai",
+    "bridge",
+    "ai-collaboration"
+  ]
+}
