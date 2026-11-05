@@ -1,4 +1,4 @@
-# dsh-codex-bridge — GPT / Codex 对话桥（DSH 插件）
+# dsh-codex-handoff — GPT / Codex 对话桥（DSH 插件）
 
 把本机 Codex CLI（GPT）接进 DeepSeek Harness：**每一轮往来都能在 DSH 侧栏点开查看**，会话落进 Codex 会话库，
 并且可以用一个工具让 GPT 作为 DSH 的子代理被调用、按同一个 thread 多轮续接。
@@ -11,7 +11,7 @@
 `%LOCALAPPDATA%\OpenAI\Codex\bin\*\codex.exe`、`CODEX_BIN`、PATH 里找）。
 
 ```powershell
-git clone https://github.com/HATO-24/dsh-codex-bridge.git
+git clone https://github.com/HATO-24/dsh-codex-handoff.git
 ```
 
 然后在 DSH 里装进当前 profile，两种方式任选：

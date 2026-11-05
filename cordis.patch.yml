@@ -2,4 +2,4 @@
 # Client 半边在侧栏注册一个可点开的对话记录面板。
 - insert:
     - id: codex-bridge
-      name: dsh-codex-bridge
+      name: dsh-codex-handoff
