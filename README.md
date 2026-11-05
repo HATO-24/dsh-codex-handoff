@@ -30,11 +30,15 @@ git clone https://github.com/HATO-24/dsh-codex-handoff.git
 
 装好后：
 
-- 左侧栏面板列表多出 **GPT 对话**：点它就会在 **DSH 右侧栏** 打开对话面板
-- 右侧栏顶部会多一个 **GPT 对话** 标签（和「开始」并列），点标签也能切换回来
+- **左下角**（Settings 旁、催更姬旁边）多一个 **GPT** 按钮：点它在 **DSH 右侧栏** 打开对话面板
+- 右侧栏顶部出现 **GPT 对话** 标签（和「开始」并列）
 - 会话标题栏最右侧还有一个对话气泡按钮，作为快捷入口
 
-> 注意：Client 插件改了 `inject` 或新增依赖后，**要重启 DSH** 才会重新解析。
+> 为什么不用左侧栏图标？点它会切走 conversation，`sidebarRight.mounted` 变空，
+> `openResource` 直接抛 `sidebarRight: no session surface is mounted`。
+> 这是 DSH 的机制限制，所以入口必须放在**不切面板**的位置（左下角 / 会话头部）。
+
+> 注意：Client 插件改了 `inject` 后**要重启 DSH** 才会重新解析。
 
 > 本地改代码后，在插件页把该插件 **禁用 → 启用** 即可重载新代码，不用重启 DSH。
 > 首次调用会消耗 Codex 额度；想省上下文就把 `DSH_CODEX_BRIDGE_ISOLATE=1` 打开。
@@ -107,15 +111,19 @@ codex exec -c 'mcp_servers={}' ...
 
 对话面板**住在 DSH 右侧栏**里（和催更姬用的是同一个扩展点）：
 
-- 点左侧栏的 **GPT 对话** 图标 → 右侧栏自动打开「GPT 对话」标签，中间只留一句提示
-- 右侧栏本身也可以拖动分隔条调整宽度
-- 会话标题栏最右侧的对话气泡按钮是快捷入口，效果相同
-- 右侧栏服务不可用时，自动退回浮层抽屉（`Esc` 关闭、左边缘可拖拽宽度）
+- 点**左下角的 GPT 按钮**（或会话标题栏的气泡按钮）→ 右侧栏自动展开「GPT 对话」标签
+- 右侧栏本身可以拖动分隔条调整宽度
+- 主面板不受影响，对话照常进行
 
 实现用的是 `ctx.sidebarRightTabs.register()` + `sidebar.right.pane.tab` slot，来自 DSH 内置的
 `@deepseek-ai/dsh-client-ui-sidebar-right`。**关键点：Client 插件的 `inject` 必须显式声明
 `sidebarRight` / `sidebarRightTabs`**，否则 `ctx` 里根本看不到这两个服务（这是踩过的坑，
-表现为 tab 静默不注册、甚至把整个 apply 打断导致侧栏图标消失）。
+表现为 tab 静默不注册、甚至把整个 apply 打断导致界面元素消失）。
+
+**入口位置也踩过坑**：`sidebarRight.openResource()` 内部调 `this.require()`，它要求
+`this.mounted.getSnapshot()` 有值（屏幕上必须挂着一个会话）。所以入口**不能放在会切走
+conversation 的地方**——左侧栏图标会切主面板，conversation 卸载后 `mounted` 为空，
+直接抛 `sidebarRight: no session surface is mounted`。只能用左下角按钮或会话头部按钮。
 
 样式全部走 DSH 的 theme token（`--dsw-alias-bg-base` / `--dsw-alias-label-primary` /
 `--dsw-alias-brand-primary` 等），明暗主题与换肤自动跟随。注意 `--dsw-alias-bg` / `--dsw-alias-text`
