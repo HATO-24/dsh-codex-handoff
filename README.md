@@ -30,8 +30,11 @@ git clone https://github.com/HATO-24/dsh-codex-handoff.git
 
 装好后：
 
-- 左侧栏面板列表多出 **GPT 对话**（点开在中间整页查看）
-- 会话标题栏最右侧多一个对话气泡按钮（点开是右侧抽屉）
+- 左侧栏面板列表多出 **GPT 对话**：点它就会在 **DSH 右侧栏** 打开对话面板
+- 右侧栏顶部会多一个 **GPT 对话** 标签（和「开始」并列），点标签也能切换回来
+- 会话标题栏最右侧还有一个对话气泡按钮，作为快捷入口
+
+> 注意：Client 插件改了 `inject` 或新增依赖后，**要重启 DSH** 才会重新解析。
 
 > 本地改代码后，在插件页把该插件 **禁用 → 启用** 即可重载新代码，不用重启 DSH。
 > 首次调用会消耗 Codex 额度；想省上下文就把 `DSH_CODEX_BRIDGE_ISOLATE=1` 打开。
@@ -100,12 +103,23 @@ codex exec -c 'mcp_servers={}' ...
 
 ## 三、用
 
-### 1. 侧栏查看记录
+### 1. 在右侧栏查看记录
 
-两个入口，同一份数据：
+对话面板**住在 DSH 右侧栏**里（和催更姬用的是同一个扩展点）：
 
-- **侧栏面板**：DSH 左侧栏面板图标里多一个 **GPT 对话**（order 30，在「写作助手」之后、「ZAI Usage」之前），点开在中间整页查看。
-- **右侧抽屉**：会话标题栏最右侧（`…` 左边）多一个对话气泡按钮，点开从右边滑出 430px 抽屉，**贴着对话看不打断主界面**；`Esc` 或右上角 × 关闭。抽屉从标题栏下方（`top: 48px`）开始——窗口控制按钮（− □ ×）在页面之上，任何 z-index 都盖不过去，只能避开。
+- 点左侧栏的 **GPT 对话** 图标 → 右侧栏自动打开「GPT 对话」标签，中间只留一句提示
+- 右侧栏本身也可以拖动分隔条调整宽度
+- 会话标题栏最右侧的对话气泡按钮是快捷入口，效果相同
+- 右侧栏服务不可用时，自动退回浮层抽屉（`Esc` 关闭、左边缘可拖拽宽度）
+
+实现用的是 `ctx.sidebarRightTabs.register()` + `sidebar.right.pane.tab` slot，来自 DSH 内置的
+`@deepseek-ai/dsh-client-ui-sidebar-right`。**关键点：Client 插件的 `inject` 必须显式声明
+`sidebarRight` / `sidebarRightTabs`**，否则 `ctx` 里根本看不到这两个服务（这是踩过的坑，
+表现为 tab 静默不注册、甚至把整个 apply 打断导致侧栏图标消失）。
+
+样式全部走 DSH 的 theme token（`--dsw-alias-bg-base` / `--dsw-alias-label-primary` /
+`--dsw-alias-brand-primary` 等），明暗主题与换肤自动跟随。注意 `--dsw-alias-bg` / `--dsw-alias-text`
+这类名字**不存在**，写了会静默回退到硬编码色值——这也是踩过的坑。
 
 两个入口都显示每段会话的**模型与推理强度**：
 
@@ -123,7 +137,7 @@ codex exec -c 'mcp_servers={}' ...
 
 ### 1.5 在面板里直接发消息、切换模型
 
-侧栏面板和右侧抽屉底部都有发送区：
+右侧栏底部有发送区：
 
 - 输入框：`Enter` 发送、`Shift+Enter` 换行
 - **模型下拉**：来自 `/models`，列出 `codex debug models` 里的全部 10 个模型
@@ -189,6 +203,7 @@ codex_gpt({ threadId: "01a1ac8e-01a4-79a2-a70d-855254e70751", message: "继续�
 | GET | `/status` | 工作区、codex 路径、隔离开关 |
 | GET | `/models` | 可用模型目录（slug / 显示名 / 支持的推理档位） |
 | POST | `/send` | 发一轮真实对话，body：`{message, conversationId?, threadId?, model?, reasoning?}` |
+| POST | `/promote` | 把一段会话标记成 Codex App 可见，body：`{threadId}` 或 `{conversationId}` |
 
 ```powershell
 $body = @{ message = "只回复两个字：收到"; reasoning = "low" } | ConvertTo-Json -Compress
@@ -200,13 +215,21 @@ Invoke-WebRequest -Uri "http://127.0.0.1:12530/api/codex-bridge/send" -Method PO
 > `POST /send` 会**真实消耗 Codex 额度**，且同步等待（一次 `low` 推理实测约 58 秒）。
 > 路由用 Node 原生 handler 而非 `resource`：`resource` 路由只放行 GET/HEAD，POST 会被平台层直接 405。
 
-### 3. 在 Codex 软件里做第二轮
+### 3. 在 Codex 软件里做第二轮（按需转换）
 
-会话**默认持久化**（不再 `--ephemeral`），所以：
+会话**默认持久化**（不再 `--ephemeral`），会写进 `~/.codex/sessions/` 并注册到 Codex 的
+state DB，命令行随时可以 `codex exec resume <thread_id> -` 继续。
 
-- 桥发起的对话会出现在 `~/.codex/sessions/` 并注册进 Codex 的 state DB；
-- 在 Codex 桌面应用的会话列表里可以直接找到、继续；
-- 命令行也能续：`codex exec resume <thread_id> -`。
+但 **Codex 桌面版的会话列表只显示 `source = "vscode"` 的线程**；`codex exec` 写的是 `exec`，
+所以默认在 App 列表里看不到（实测：数据三处齐全——threads、projection state、turns——仍然不显示）。
+
+因此提供了**按需转换**：在会话详情里点 **「转移到 Codex」**，插件会把该 thread 的 `source`
+改成 `vscode`，之后**重启 Codex App** 就能在列表里找到并继续。
+
+- 只改 `source` 一个字段（用 Node 内置 `node:sqlite`）
+- 不想每轮都改，所以做成了手动按钮，不是自动行为
+- `DSH_CODEX_BRIDGE_APP_VISIBLE=0` 可以整个关掉这个能力
+- 试过官方的 `codex exec --thread-source vscode`：**无效**，写进去仍是 `exec`
 
 ### 4. Codex 侧回读（两边都能继续）
 
